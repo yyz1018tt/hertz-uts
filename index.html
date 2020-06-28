@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Hertz-UTS</title>
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+            integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.5.1.js"
+            integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+            crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+            crossorigin="anonymous"></script>
+
+        <script type="text/javascript">
+            onload = getData()
+            function getData() {
+                var xmlhttp;
+                if (window.XMLHttpRequest) {
+                    xmlhttp = new XMLHttpRequest();
+                } else {
+                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        var cars = xmlhttp.responseXML.getElementsByTagName("car");
+
+                        for (var i = 0; i < cars.length; i++) {
+                            var outputs = ''
+                            var id = 0
+                            var title = cars[i].getElementsByTagName("brand")[0].firstChild.nodeValue + "-" + cars[i].getElementsByTagName("model")[0].firstChild.nodeValue + "-" + cars[i].getElementsByTagName("year")[0].firstChild.nodeValue + "<br>"
+                            outputs += "<b>Category: </b>" + cars[i].getElementsByTagName("category")[0].firstChild.nodeValue + "<br>";
+                            outputs += "<b>Availability: </b>" + cars[i].getElementsByTagName("availability")[0].firstChild.nodeValue + "<br>";
+                            outputs += "<b>Mileage: </b>" + cars[i].getElementsByTagName("mileage")[0].firstChild.nodeValue + "<br>";
+                            outputs += "<b>Fuel: </b>" + cars[i].getElementsByTagName("fuel")[0].firstChild.nodeValue + "<br>";
+                            outputs += "<b>Seats: </b>" + cars[i].getElementsByTagName("seats")[0].firstChild.nodeValue + "<br>";
+                            outputs += "<b>Price: </b>" + cars[i].getElementsByTagName("price")[0].firstChild.nodeValue + "<br>";
+                            outputs += "<b>Description: </b>" + cars[i].getElementsByTagName("description")[0].firstChild.nodeValue + "<br><br>";
+                            id = cars[i].getElementsByTagName('id')[0].firstChild.nodeValue
+
+                            var div1 = document.createElement("div")
+                            div1.className = 'card mx-3 my-2'
+                            div1.style = 'width: 20rem;'
+
+                            var img = document.createElement("img")
+                            img.className = "card-img-top"
+                            img.style = "height: 225px"
+                            img.src = "./img/" + cars[i].getElementsByTagName("model")[0].firstChild.nodeValue + ".jpg"
+
+                            var div2 = document.createElement("div")
+                            div2.className = "card-body mb-3"
+
+                            var h5 = document.createElement("h5")
+                            h5.className = "card-title"
+                            h5.innerHTML = title
+
+                            var p = document.createElement("p")
+                            p.className = "mb-3"
+                            p.innerHTML = outputs
+
+                            var bookButton = document.createElement("a")
+                            bookButton.className = "btn btn-primary"
+                            bookButton.style = "color: white"
+                            bookButton.innerHTML = "Make Reservation"
+                            bookButton.id = id
+                            bookButton.onclick = function () {
+                                showInfo(this)
+                            }
+
+
+                            div1.appendChild(img)
+                            div1.appendChild(div2)
+                            div2.appendChild(h5)
+                            div2.appendChild(p)
+                            div2.appendChild(bookButton)
+
+                            document.getElementById("display").appendChild(div1)
+                        }
+                        // document.getElementById('data').innerHTML = outputs
+                    }
+                }
+
+                xmlhttp.open("GET", "cars.xml", true);
+                xmlhttp.send();
+
+            }
+
+            function showInfo(btn) {
+
+                var id = btn.getAttributeNode('id').value
+                var xmlhttp = new XMLHttpRequest()
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        var cars = xmlhttp.responseXML.getElementsByTagName("car")
+                        for (var i = 0; i < cars.length; i++) {
+                            if (cars[i].getElementsByTagName('id')[0].firstChild.nodeValue == id) {
+                                if (cars[i].getElementsByTagName('availability')[0].firstChild.nodeValue == 'Yes') {
+                                    makeReservation(id)
+                                    alert("Added this car to cart")
+                                } else alert("Sorry, the car is not available now. Please try other cars")
+                            }
+                        }
+                    }
+                }
+                xmlhttp.open("GET", 'cars.xml', true)
+                xmlhttp.send()
+            }
+
+            function makeReservation(id) {
+                // console.log(id)
+                var xmlhttp = new XMLHttpRequest()
+
+                xmlhttp.open("GET", "makeReservation.php?id=" + id, true)
+                // window.location = "http://localhost/hertz-uts/makeReservation.php"
+                xmlhttp.send()
+            }
+        </script>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Hertz-UTS</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" style="text-align: center;" id="navbarSupportedContent">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Car Rental Center <span class="sr-only">(current)</span></a>
+                    </li>
+                </ul>
+                <ul class="form-inline my-2 my-lg-0">
+                    <a style="color:green;" href="cart.php" class="btn btn-outline-success my-2 my-sm-0"
+                        type="submit">Cart</a>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div id="display" class="row mt-5 mx-auto"></div>
+            <!-- <div id="data">
+                <h2>replace</h2>
+            </div> -->
+        </div>
+
+
+
+    </body>
+
+</html>
